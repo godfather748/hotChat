@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
         users = []
         socketMap = {}
         io.emit('checkIfOnline')
-    }, 120000);
+    }, 300000);
 
     socket.on('replyToCheck', (data) => {
         users.push(data.user)

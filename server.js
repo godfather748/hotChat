@@ -25,11 +25,10 @@ function getRandomIcon() {
 let iconMap = {}
 
 io.on('connection', (socket) => {
-    console.log('connected with socketId = ', socket.id)
 
     function login(s, u) {
         s.join(u)
-        socketMap[s.id] = u
+        socketMap[u] = s.id
         iconMap[u] = getRandomIcon()
         s.emit('logged-in', {
             user: u,
@@ -58,8 +57,22 @@ io.on('connection', (socket) => {
         })
     })
 
+    setInterval(() => {
+        users = []
+        socketMap = {}
+        io.emit('checkIfOnline')
+    }, 120000);
+
+    socket.on('replyToCheck', (data) => {
+        users.push(data.user)
+        socketMap[data.user] = data.id
+        io.emit('yes-logged-in', {
+            users,
+            iconMap
+        })
+    })
+
     socket.on('msg_send', (data) => {
-        data.from = socketMap[socket.id]
         data.icon = iconMap[data.from]
         if (data.to != 'Everyone') {
             io.to(data.to).emit('msg_rcvd', data)
@@ -68,16 +81,17 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('userLeft', (data)=>{
+    socket.on('userLeft', (data) => {
         delete usersPass[data]
         delete iconMap[data]
         const index = users.indexOf(data);
+        delete socketMap[data]
         users.splice(index, 1);
         io.emit('yes-logged-in', {
             users,
             iconMap
         })
-        
+
     })
 })
 

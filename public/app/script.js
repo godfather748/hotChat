@@ -129,6 +129,7 @@ $("#onlinePeople").on("click", "li", function (event) {
 
 $('#btnSend').click(() => {
     socket.emit('msg_send', {
+        from: currentUser,
         to: $('#onlinePeople .active .user_info span').text(),
         message: $('#inpMessage').val()
     })
@@ -178,4 +179,13 @@ $('#crossIcon').click(() => {
 
 $('#attachBtn').click(() => {
     $('.action_menu').toggle()
+})
+
+
+socket.on('checkIfOnline',()=>{
+    console.log('hii')
+    socket.emit('replyToCheck',{
+        id: socket.id,
+        user: currentUser
+    })
 })

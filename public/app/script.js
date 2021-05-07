@@ -89,6 +89,7 @@ socket.on('logged-in', (data) => {
     $('#chatpage').show()
     $('#letschat').show()
     $('.chatBox').hide()
+    $('.chatBoxHeader').hide()
     $('#chatBoxFooter').hide()
     $('#crossIcon').hide()
     window.currentUser = data.user
@@ -123,6 +124,9 @@ $("#onlinePeople").on("click", "li", function (event) {
         $('.chatBox').hide()
         $(`.chatBox.${$('#onlinePeople .active .user_info span').text()}`).show()
         $('#chatBoxFooter').show()
+        $('.chatBoxHeader').show()
+        $(`.chatBoxHeader .img_cont img`).attr('src',`${$('#onlinePeople .active .img_cont img').attr('src')}`)
+        $('.chatBoxHeader #user_info_name').text(`${$('#onlinePeople .active .user_info span').text()}`)
     }
 });
 

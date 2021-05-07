@@ -50,9 +50,10 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('new-logged-in', () => {
+    socket.on('new-logged-in', (user) => {
         io.emit('yes-logged-in', {
             users,
+            user,
             iconMap
         })
     })
@@ -61,7 +62,7 @@ io.on('connection', (socket) => {
         users = []
         socketMap = {}
         io.emit('checkIfOnline')
-    }, 300000);
+    }, 120000);
 
     socket.on('replyToCheck', (data) => {
         users.push(data.user)
@@ -77,6 +78,7 @@ io.on('connection', (socket) => {
         if (data.to != 'Everyone') {
             io.to(data.to).emit('msg_rcvd', data)
         } else {
+            data.from = 'Everyone'
             socket.broadcast.emit('msg_rcvd', data)
         }
     })

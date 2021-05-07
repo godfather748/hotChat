@@ -75,6 +75,12 @@ function onlinePeople(data) {
                                 </li>`))
 }
 
+function indiChatBox(user){
+    $(`<div class="${user} chatBox card-body msg_card_body"></div>`).insertBefore($('#chatBoxId #chatBoxFooter'))
+    // $('#chatBoxId #chatBoxFooter').appendTo($('#chatBoxId .chatBox'))
+    $(`#chatBoxId div.${user}`).hide()
+}
+
 let currentIcon
 
 socket.on('logged-in', (data) => {
@@ -82,17 +88,18 @@ socket.on('logged-in', (data) => {
     $('#loginBox').hide()
     $('#chatpage').show()
     $('#letschat').show()
-    $('#chatBox').hide()
+    $('.chatBox').hide()
     $('#chatBoxFooter').hide()
     $('#crossIcon').hide()
     window.currentUser = data.user
     currentIcon = data.currentIcon
-    socket.emit('new-logged-in')
+    socket.emit('new-logged-in', currentUser)
 })
 
 
 socket.on('yes-logged-in', async (data) => {
     await onlinePeople(data)
+    await indiChatBox(data.user)
 })
 
 socket.on('login failed', () => {
@@ -113,9 +120,9 @@ $("#onlinePeople").on("click", "li", function (event) {
         $('#onlinePeople .active').removeClass('active')
         $(this).addClass('active')
         $('#letschat').hide()
-        $('#chatBox').show()
+        $('.chatBox').hide()
+        $(`.chatBox.${$('#onlinePeople .active .user_info span').text()}`).show()
         $('#chatBoxFooter').show()
-        $('#uploadId').hide()
     }
 });
 
@@ -133,7 +140,7 @@ $('#btnSend').click(() => {
         to: $('#onlinePeople .active .user_info span').text(),
         message: $('#inpMessage').val()
     })
-    $('#chatBox').append($(`<div class="d-flex justify-content-end mb-4">
+    $(`.chatBox.${$('#onlinePeople .active .user_info span').text()}`).append($(`<div class="d-flex justify-content-end mb-4">
                                     <div class="msg_cotainer_send">
                                         ${$('#inpMessage').val()}
                                     </div>
@@ -146,7 +153,7 @@ $('#btnSend').click(() => {
 
 
 socket.on('msg_rcvd', (data) => {
-    $('#chatBox').append($(`<div class="d-flex justify-content-start mb-4">
+    $(`.chatBox.${data.from}`).append($(`<div class="d-flex justify-content-start mb-4">
                                     <div class="img_cont_msg">
                                         <img src="/icons/${data.icon}.png"
                                             class="rounded-circle user_img_msg">
@@ -174,11 +181,6 @@ $('#crossIcon').click(() => {
     $('#onlinePeople li').show()
     $('#searchIcon').show()
     $('#crossIcon').hide()
-})
-
-
-$('#attachBtn').click(() => {
-    $('.action_menu').toggle()
 })
 
 
